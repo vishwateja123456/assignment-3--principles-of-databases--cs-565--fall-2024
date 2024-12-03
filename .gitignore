@@ -1,6 +1,7 @@
 *
 
 !README.md
+!server.js
 !.gitignore
 !.editorconfig
 !package.json
