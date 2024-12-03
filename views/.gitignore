@@ -1,0 +1,10 @@
+*
+
+!.gitignore
+!create-a-record-in-database.njk
+!delete-a-record-in-database.njk
+!index.njk
+!read-from-database.njk
+!update-a-record-in-database.njk
+
+!blocks/
