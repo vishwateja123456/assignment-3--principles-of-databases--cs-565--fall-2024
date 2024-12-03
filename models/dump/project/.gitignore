@@ -1,0 +1,5 @@
+*
+
+!.gitignore
+!users.bson
+!users.metadata.json
