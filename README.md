@@ -10,6 +10,18 @@
 4. Checkout your personalized branch, the one with your name and GitHub handle.
 
 ---
+## ❖・Stand Up the Current MENN (Mongo, Express, Nunjucks, Node) Stack・❖
+
+1. Start the Mongo server.
+2. Open a CLI window and log in to Mongo: `mongosh`
+3. Open another CLI window and navigate to the `models` folder.
+4. Run `mongorestore`, which will restore the `project` database containing the `users` collection from the `dump` folder.
+5. Navigate to the root folder of this repo.
+6. Install the dependencies from the `package.json` file by running `npm i`.
+7. Run `npm run dev`.
+8. Visit `http://localhost:3000` in any browser.
+
+---
 ## ❖・Due・❖
 
 Wednesday, 11 December 2024, at 10:00 PM. ***Note*: Per the syllabus, NO late submissions will be accepted**
