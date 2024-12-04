@@ -10,7 +10,7 @@
 4. Checkout your personalized branch, the one with your name and GitHub handle.
 
 ---
-## ❖・Stand Up the Current MENN (Mongo, Express, Nunjucks, Node) Stack・❖
+## ❖・Stand Up the MENN (Mongo, Express, Nunjucks, Node) Stack・❖
 
 1. Start the Mongo server.
 2. Open a CLI window and log in to Mongo: `mongosh`
