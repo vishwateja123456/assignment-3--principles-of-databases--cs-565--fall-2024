@@ -142,3 +142,21 @@ app.post(`/create-a-db-record`, (req, res) => {
         }
     });
 });
+
+/*
+ * This router handles GET requests to
+ * http://localhost:3000/update-a-db-record/
+ */
+app.get(`/update-a-db-record`, (req, res) => {
+    db.collection(dbCollection).find().toArray((err, arrayObject) => {
+        if (err) {
+            return console.log(err);
+        } else {
+            console.log(`User requested the resource ` +
+                `http://${HOST}:${port}/update-a-db-record`);
+
+            res.render(`update-a-record-in-database.njk`,
+                {mongoDBArray: arrayObject});
+        }
+    });
+});
