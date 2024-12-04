@@ -116,7 +116,8 @@ app.get(`/read-a-db-record`, (req, res) => {
 });
 
 /*
- * This router handles GET requests to http://localhost:3000/create-a-db-record/
+ * This router handles GET requests to
+ * http://localhost:3000/create-a-db-record/
  */
 app.get(`/create-a-db-record`, (req, res) => {
     res.render(`create-a-record-in-database.njk`);
