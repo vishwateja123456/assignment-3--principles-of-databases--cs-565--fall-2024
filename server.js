@@ -46,3 +46,13 @@ mongoClient.connect(`${dbURL}:${dbPort}`, (err, client) => {
             colors.green, dbName, colors.reset, `\n`);
     }
 });
+
+/*
+ * Configure Node to act as a web server
+ */
+app.listen(port, HOST, () => {
+    console.log(`Host successfully connected:`);
+    console.log(`\tServer URL:`, colors.green, `localhost`, colors.reset);
+    console.log(`\tServer port:`, colors.green, port, colors.reset);
+    console.log(`\tVisit http://localhost:${port}\n`);
+});
