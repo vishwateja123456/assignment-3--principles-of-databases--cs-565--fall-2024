@@ -13,7 +13,7 @@
 
 ## ❖・Introduction・❖
 
-For this assignment, you will complete update and delete routines in a web app using the MENN (Mongo, Express, Nunjucks, Node) stack. You will not need to add any files to this scaffold; all required files are already included in this repo. Routines, or routes, for the update and delete procedures must go in the included `server.js` file. A starter database is included in this project (see below).
+For this assignment, you will complete update and delete routines in a web app using the MENN (Mongo, Express, Nunjucks, Node) stack. You will not need to add any files to this scaffold; all required files are already included in this repo. Routines, or routes, for the update and delete procedures must go in the included `server.js` file. When either route is carried out successfully, a message in the CLI should report the task carried out. For example, if a record was removed, your program should report which record was removed. Do the same for the “update” route. A starter database is included in this project (see below).
 
 ---
 
