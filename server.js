@@ -62,3 +62,21 @@ app.listen(port, HOST, () => {
  * engine” to “njk” for Nunjucks
  */
 app.set(`view engine`, `njk`);
+
+/*
+ * Express’s middleware to parse incoming, form-based request data before
+ * processing form data
+ */
+app.use(bodyParser.urlencoded({extended: true}));
+
+/*
+ * Express’s middleware to parse incoming request bodies before handlers
+ */
+app.use(bodyParser.json());
+
+/*
+ * Express’s middleware to serve HTML, CSS, and JavaScript files from the
+ * included “public” folder. Note: There are no JavaScript files in the
+ * “public” folder
+ */
+app.use(express.static(`public`));
