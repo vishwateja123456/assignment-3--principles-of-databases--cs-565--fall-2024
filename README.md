@@ -22,6 +22,18 @@
 8. Visit `http://localhost:3000` in any browser.
 
 ---
+
+## ❖・Grading・❖
+
+| Item                                   | Points |
+|----------------------------------------|:------:|
+| Following directions                   |  `25`  |
+| Syntax, style, and neatness            |  `25`  |
+| Update router carried out successfully |  `25`  |
+| Delete router carried out successfully |  `25`  |
+
+---
+
 ## ❖・Due・❖
 
 Wednesday, 11 December 2024, at 10:00 PM. ***Note*: Per the syllabus, NO late submissions will be accepted**
