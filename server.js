@@ -80,3 +80,9 @@ app.use(bodyParser.json());
  * “public” folder
  */
 app.use(express.static(`public`));
+
+/*
+ * Note:
+ *   — “req” stands for requests, which arrive from the client/browser
+ *   — “res” stands for responses, which are sent to the client/browser
+ */
