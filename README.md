@@ -10,6 +10,13 @@
 4. Checkout your personalized branch, the one with your name and GitHub handle.
 
 ---
+
+## ❖・Introduction・❖
+
+For this assignment, you will complete update and delete routines in a web app using the MENN (Mongo, Express, Nunjucks, Node) stack. You will not need to add any files to this scaffold; all required files are already included in this repo. Routines, or routes, for the update and delete procedures must go in the included `server.js` file. A starter database is included in this project (see below).
+
+---
+
 ## ❖・Stand Up the MENN (Mongo, Express, Nunjucks, Node) Stack・❖
 
 1. Start the Mongo server.
