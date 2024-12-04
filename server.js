@@ -97,3 +97,20 @@ app.get(`/`, (req, res) => {
 
     res.render(`index.njk`);
 });
+
+/*
+ * This router handles GET requests to http://localhost:3000/read-a-db-record/
+ */
+app.get(`/read-a-db-record`, (req, res) => {
+    db.collection(dbCollection).find().toArray((err, arrayObject) => {
+        if (err) {
+            return console.log(err);
+        } else {
+            console.log(`User requested http://${HOST}:${port}/read-a-db-record.`);
+            console.log(`Responding to request with file`,
+                colors.green, `read-from-database.njk`, colors.reset, `via GET.\n`);
+
+            res.render(`read-from-database.njk`, {mongoDBArray: arrayObject});
+        }
+    });
+});
