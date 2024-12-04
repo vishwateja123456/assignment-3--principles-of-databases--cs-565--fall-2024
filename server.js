@@ -19,3 +19,11 @@ const colors = {
 };
 
 let db;
+
+/*
+ * Configure the “views” folder to work with Nunjucks
+ */
+nunjucks.configure(`views`, {
+    express: app,
+    autoescape: true
+});
