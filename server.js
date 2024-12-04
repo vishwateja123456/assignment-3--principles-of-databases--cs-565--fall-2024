@@ -114,3 +114,30 @@ app.get(`/read-a-db-record`, (req, res) => {
         }
     });
 });
+
+/*
+ * This router handles GET requests to http://localhost:3000/create-a-db-record/
+ */
+app.get(`/create-a-db-record`, (req, res) => {
+    res.render(`create-a-record-in-database.njk`);
+});
+
+/*
+ * This router handles POST requests — via the Nunjucks partial
+ * “create-a-record-in-database.njk” — submitted from the form located at
+ * http://localhost:3000/create-a-db-record/
+ */
+app.post(`/create-a-db-record`, (req, res) => {
+    db.collection(dbCollection).insertOne(req.body, (err) => {
+        console.log(req.body);
+
+        if (err) {
+            return console.log(err);
+        } else {
+            console.log(
+                `Inserted one record into Mongo via an HTML form using POST.\n`);
+
+            res.redirect(`/read-a-db-record`);
+        }
+    });
+});
