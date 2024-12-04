@@ -86,3 +86,14 @@ app.use(express.static(`public`));
  *   — “req” stands for requests, which arrive from the client/browser
  *   — “res” stands for responses, which are sent to the client/browser
  */
+
+/*
+ * This router handles GET requests to the root of the web site
+ */
+app.get(`/`, (req, res) => {
+    console.log(`User requested root of web site.`);
+    console.log(`Responding to request with file`,
+        colors.green, `index.njk`, colors.reset, `via GET.`);
+
+    res.render(`index.njk`);
+});
