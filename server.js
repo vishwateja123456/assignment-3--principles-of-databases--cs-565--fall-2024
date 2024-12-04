@@ -27,3 +27,22 @@ nunjucks.configure(`views`, {
     express: app,
     autoescape: true
 });
+
+/*
+ * Configure the Node MongoDB client to connect to Mongo, established a database
+ * connection and assigning the reference to the “db” variable defined on line
+ * 21
+ */
+mongoClient.connect(`${dbURL}:${dbPort}`, (err, client) => {
+    if (err) {
+        return console.log(err);
+    } else {
+        db = client.db(dbName);
+
+        console.log(`MongoDB successfully connected:`);
+        console.log(`\tMongo URL:`, colors.green, dbURL, colors.reset);
+        console.log(`\tMongo port:`, colors.green, dbPort, colors.reset);
+        console.log(`\tMongo database name:`,
+            colors.green, dbName, colors.reset, `\n`);
+    }
+});
