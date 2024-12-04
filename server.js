@@ -56,3 +56,9 @@ app.listen(port, HOST, () => {
     console.log(`\tServer port:`, colors.green, port, colors.reset);
     console.log(`\tVisit http://localhost:${port}\n`);
 });
+
+/*
+ * Express’s way of setting a variable. In this case, set the variable “view
+ * engine” to “njk” for Nunjucks
+ */
+app.set(`view engine`, `njk`);
