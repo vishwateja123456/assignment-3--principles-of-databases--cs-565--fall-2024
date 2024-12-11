@@ -4,13 +4,14 @@ const nunjucks = require(`nunjucks`);
 const bodyParser = require(`body-parser`);
 const mongoDB = require(`mongodb-legacy`);
 const mongoClient = mongoDB.MongoClient;
+
 const HOST = `localhost`;
 const dbPort = `27017`;
-const dbURL = `mongodb://${HOST}`;
+const dbURL = `mongodb://127.0.0.1:${dbPort}`; // Use IPv4 to avoid ::1 issues
 const dbName = `project`;
 const dbCollection = `users`;
-const PORT = 3000;
-const port = (process.env.PORT || PORT);
+const PORT = process.env.PORT || 3000;
+
 const colors = {
     reset: `\x1b[0m`,
     red: `\x1b[31m`,
@@ -29,145 +30,144 @@ nunjucks.configure(`views`, {
 });
 
 /*
- * Configure the Node MongoDB client to connect to Mongo, established a database
- * connection and assigning the reference to the “db” variable defined on line
- * 21
+ * MongoDB connection with retry logic
  */
-mongoClient.connect(`${dbURL}:${dbPort}`, (err, client) => {
-    if (err) {
-        return console.log(err);
-    } else {
-        db = client.db(dbName);
+const connectToMongoDB = (retries = 5, delay = 2000) => {
+    mongoClient.connect(dbURL, (err, client) => {
+        if (err) {
+            console.error(colors.red, `Failed to connect to MongoDB:`, err.message, colors.reset);
+            if (retries > 0) {
+                console.log(colors.yellow, `Retrying in ${delay / 1000} seconds... (${retries} retries left)`, colors.reset);
+                setTimeout(() => connectToMongoDB(retries - 1, delay), delay);
+            } else {
+                console.error(colors.red, `Unable to connect to MongoDB after multiple attempts.`, colors.reset);
+                process.exit(1);
+            }
+        } else {
+            db = client.db(dbName);
+            console.log(colors.green, `MongoDB successfully connected:`, colors.reset);
+            console.log(`\tMongo URL:`, dbURL);
+            console.log(`\tMongo Database Name:`, dbName, `\n`);
+        }
+    });
+};
 
-        console.log(`MongoDB successfully connected:`);
-        console.log(`\tMongo URL:`, colors.green, dbURL, colors.reset);
-        console.log(`\tMongo port:`, colors.green, dbPort, colors.reset);
-        console.log(`\tMongo database name:`,
-            colors.green, dbName, colors.reset, `\n`);
-    }
-});
+connectToMongoDB();
 
 /*
  * Configure Node to act as a web server
  */
-app.listen(port, HOST, () => {
-    console.log(`Host successfully connected:`);
-    console.log(`\tServer URL:`, colors.green, `localhost`, colors.reset);
-    console.log(`\tServer port:`, colors.green, port, colors.reset);
-    console.log(`\tVisit http://localhost:${port}\n`);
+app.listen(PORT, HOST, () => {
+    console.log(colors.green, `Host successfully connected:`, colors.reset);
+    console.log(`\tServer URL: http://localhost:${PORT}\n`);
 });
 
 /*
- * Express’s way of setting a variable. In this case, set the variable “view
- * engine” to “njk” for Nunjucks
+ * Express middleware
  */
 app.set(`view engine`, `njk`);
-
-/*
- * Express’s middleware to parse incoming, form-based request data before
- * processing form data
- */
-app.use(bodyParser.urlencoded({extended: true}));
-
-/*
- * Express’s middleware to parse incoming request bodies before handlers
- */
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-/*
- * Express’s middleware to serve HTML, CSS, and JavaScript files from the
- * included “public” folder. Note: There are no JavaScript files in the
- * “public” folder
- */
 app.use(express.static(`public`));
 
 /*
- * Note:
- *   — “req” stands for requests, which arrive from the client/browser
- *   — “res” stands for responses, which are sent to the client/browser
+ * Routes
  */
 
-/*
- * This router handles GET requests to the root of the web site
- */
+// Root route
 app.get(`/`, (req, res) => {
-    console.log(`User requested root of web site.`);
-    console.log(`Responding to request with file`,
-        colors.green, `index.njk`, colors.reset, `via GET.`);
-
+    console.log(colors.green, `Serving root page.`, colors.reset);
     res.render(`index.njk`);
 });
 
-/*
- * This router handles GET requests to http://localhost:3000/read-a-db-record/
- */
+// Read Records
 app.get(`/read-a-db-record`, (req, res) => {
+    const popupMessage = req.query.popupMessage || '';
+    if (!db) return res.status(500).send(`Database not connected.`);
     db.collection(dbCollection).find().toArray((err, arrayObject) => {
         if (err) {
-            return console.log(err);
-        } else {
-            console.log(`User requested http://${HOST}:${port}/read-a-db-record.`);
-            console.log(`Responding to request with file`,
-                colors.green, `read-from-database.njk`, colors.reset, `via GET.\n`);
-
-            res.render(`read-from-database.njk`, {mongoDBArray: arrayObject});
+            console.error(colors.red, `Error fetching records:`, err, colors.reset);
+            return res.status(500).send(`Error fetching records.`);
         }
+        res.render(`read-from-database.njk`, { mongoDBArray: arrayObject, popupMessage });
     });
 });
 
-/*
- * This router handles GET requests to
- * http://localhost:3000/create-a-db-record/
- */
+// Create Record
 app.get(`/create-a-db-record`, (req, res) => {
     res.render(`create-a-record-in-database.njk`);
 });
 
-/*
- * This router handles POST requests — via the Nunjucks partial
- * “create-a-record-in-database.njk” — submitted from the form located at
- * http://localhost:3000/create-a-db-record/
- */
 app.post(`/create-a-db-record`, (req, res) => {
+    if (!db) return res.status(500).send(`Database not connected.`);
     db.collection(dbCollection).insertOne(req.body, (err) => {
-        console.log(req.body);
-
         if (err) {
-            return console.log(err);
-        } else {
-            console.log(
-                `Inserted one record into Mongo via an HTML form using POST.\n`);
-
-            res.redirect(`/read-a-db-record`);
+            console.error(colors.red, `Error creating record:`, err, colors.reset);
+            return res.status(500).send(`Error creating record.`);
         }
+        console.log(colors.green, `Record created successfully:`, req.body, colors.reset);
+        res.redirect(`/read-a-db-record?popupMessage=Record successfully created!`);
     });
 });
 
-/*
- * This router handles GET requests to
- * http://localhost:3000/update-a-db-record/
- */
+// Update Record
 app.get(`/update-a-db-record`, (req, res) => {
+    const popupMessage = req.query.popupMessage || '';
+    if (!db) return res.status(500).send(`Database not connected.`);
     db.collection(dbCollection).find().toArray((err, arrayObject) => {
         if (err) {
-            return console.log(err);
-        } else {
-            console.log(`User requested the resource ` +
-                `http://${HOST}:${port}/update-a-db-record`);
-
-            res.render(`update-a-record-in-database.njk`,
-                {mongoDBArray: arrayObject});
+            console.error(colors.red, `Error fetching records:`, err, colors.reset);
+            return res.status(500).send(`Error fetching records.`);
         }
+        res.render(`update-a-record-in-database.njk`, { mongoDBArray: arrayObject, popupMessage });
     });
 });
 
-/*
- * This router handles GET requests to
- * http://localhost:3000/delete-a-db-record/
- */
+app.post(`/update-a-db-record`, (req, res) => {
+    if (!db) return res.status(500).send(`Database not connected.`);
+    const { name, password } = req.body;
+    db.collection(dbCollection).updateOne(
+        { name },
+        { $set: { password } },
+        (err, result) => {
+            if (err) {
+                console.error(colors.red, `Error updating record:`, err, colors.reset);
+                return res.status(500).send(`Error updating record.`);
+            } else if (result.matchedCount === 0) {
+                console.warn(colors.yellow, `No record found for name: ${name}`, colors.reset);
+                return res.redirect(`/update-a-db-record?popupMessage=No record found for user "${name}".`);
+            }
+            console.log(colors.green, `Record updated for name: ${name}`, colors.reset);
+            res.redirect(`/read-a-db-record?popupMessage=Record successfully updated!`);
+        }
+    );
+});
+
+// Delete Record
 app.get(`/delete-a-db-record`, (req, res) => {
+    const popupMessage = req.query.popupMessage || '';
+    if (!db) return res.status(500).send(`Database not connected.`);
     db.collection(dbCollection).find().toArray((err, arrayObject) => {
-        res.render(`delete-a-record-in-database.njk`,
-            {mongoDBArray: arrayObject});
+        if (err) {
+            console.error(colors.red, `Error fetching records:`, err, colors.reset);
+            return res.status(500).send(`Error fetching records.`);
+        }
+        res.render(`delete-a-record-in-database.njk`, { mongoDBArray: arrayObject, popupMessage });
+    });
+});
+
+app.post(`/delete-a-db-record`, (req, res) => {
+    if (!db) return res.status(500).send(`Database not connected.`);
+    const { name } = req.body;
+    db.collection(dbCollection).deleteOne({ name }, (err, result) => {
+        if (err) {
+            console.error(colors.red, `Error deleting record:`, err, colors.reset);
+            return res.status(500).send(`Error deleting record.`);
+        } else if (result.deletedCount === 0) {
+            console.warn(colors.yellow, `No record found for name: ${name}`, colors.reset);
+            return res.redirect(`/delete-a-db-record?popupMessage=No record found for user "${name}".`);
+        }
+        console.log(colors.green, `Record deleted for name: ${name}`, colors.reset);
+        res.redirect(`/read-a-db-record?popupMessage=Record successfully deleted!`);
     });
 });
